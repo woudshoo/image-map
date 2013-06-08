@@ -50,6 +50,9 @@ This image represention has
 		    :bytes-per-row (* 4 width)
 		    :bits-per-pixel 32))))
 
+(defun make-image-rep-with-nssize (size)
+  (make-image-rep (ns:ns-size-width size) (ns:ns-size-height size)))
+
 (defun make-hi-res-image-rep (width height)
   "Make an image representation for an Retina bitmap with size `width' x `height' in points.
 The number of pixels in the image representation is 2x`width' by 2x`height'.
@@ -57,8 +60,11 @@ The number of pixels in the image representation is 2x`width' by 2x`height'.
 See also `make-image-rep'"
   (let ((rep (make-image-rep (* 2.0 width)
 			     (* 2.0 height))))
-    (#/setSize: rep (ns:make-ns-size width height))))
+    (#/setSize: rep (ns:make-ns-size width height))
+    rep))
 
+(defun make-hi-res-image-rep-with-nssize (size)
+  (make-hi-res-image-rep (ns:ns-size-width size) (ns:ns-size-height size)))
 
 (defun save-image-rep (rep file-name)
   "Save an image representation as an PNG to file-name.

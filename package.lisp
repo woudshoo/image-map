@@ -13,5 +13,7 @@
    :load-image-rep
    :with-image-rep-context
    :image-rep-with-paked-images
-   :make-image-map))
+   :make-image-map
+   :make-image-rep-with-nssize
+   :make-hi-res-image-rep-with-nssize))
 

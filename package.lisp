@@ -15,5 +15,6 @@
    :image-rep-with-paked-images
    :make-image-map
    :make-image-rep-with-nssize
-   :make-hi-res-image-rep-with-nssize))
+   :make-hi-res-image-rep-with-nssize
+   :extract-image-from-canvas))
 

@@ -232,7 +232,12 @@ image-rep `canvas'."
 (defun pixel-value (image-rep x y)
   "Hack to get the pixel values out of an image-rep.
 The hack is based upon the fact that I have hardcoded the offsets
-and it depends on being a 64-bit lisp image."
+and it depends on being a 64-bit lisp image.
+
+In addition, this function assumes that the image rep is a 4 single plane 4 component bitmap.
+
+The return value is  a list containing the 4 components, \(red green blue alpha\)
+in the range specified in the `image-rep'.  Normally the range is 0..255."
   (ccl:%stack-block ((values (* 4 8)))
     (#/getPixel:atX:y: image-rep values x y)
     (list (ccl:%get-unsigned-long values 0)
@@ -241,6 +246,9 @@ and it depends on being a 64-bit lisp image."
 	  (ccl:%get-unsigned-long values 24))))
 
 (defun set-pixel-value (image-rep x y pixel-values)
+  "Sets a pixel value in the image.  THe `pixel-values' argument
+is a list of 4 components \(red green blue alpha\). 
+All the caveats of `pixel-value' apply."
   (ccl:%stack-block ((values (* 4 8)))
     (setf (ccl:%get-unsigned-long values 0) (nth 0 pixel-values))
     (setf (ccl:%get-unsigned-long values 8) (nth 1 pixel-values))
@@ -251,18 +259,32 @@ and it depends on being a 64-bit lisp image."
 (defsetf pixel-value set-pixel-value)
 
 (defmacro loop-all-pixels-coordinates ((x y image) &body body)
+  "Execute the forms `body' with the variables `x' and `y' bound to all pixel coordinates in `image'.
+The parameter `image' should be an iamge-rep."
   (alexandria:once-only (image)
     `(loop :for ,x :from 0 :below (#/pixelsWide ,image) :do
 	(loop :for ,y :from 0 :below (#/pixelsHigh ,image) :do
 	   ,@body))))
 
 (defun replace-pixel-value (image-rep source-pixel target-pixel)
+  "Replace in the `image-rep' all pixels whose `pixel-value' is equal to `source-pixel' 
+with a pixel whose pixel-value is `target-pixel'.
+
+The parameters `source-pixel' and `target-pixel' are both lists of 4 elements long, \(red green blue alpha\).
+Typically, each component is in the range 0..255.
+
+See the function `pixel-value' for a list of caveats."
   (loop-all-pixels-coordinates (x y image-rep)
      (when (equalp (pixel-value image-rep x y) source-pixel)
        (setf (pixel-value image-rep x y) target-pixel))))
 
 
 (defun all-pixels-this-color (image-rep color)
+  "Returns a generalized boolean, returning true if all the pixels in `image-rep' have
+pixel values equal to `color' and false if at least one pixel has a pixel value not equal to `color'.
+
+The parameter `color' is a list of 4 components \(red green blue alpha\) and see the function `pixel-value' for
+the caveats of using this function."
   (loop-all-pixels-coordinates (x y image-rep)
      (unless (equalp (pixel-value image-rep x y) color)
        (return-from all-pixels-this-color nil)))

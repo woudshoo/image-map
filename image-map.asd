@@ -6,7 +6,7 @@
   :author "Willem Rein Oudshoorn <woudshoo@xs4all.nl>"
   :version 0.1
   :license "LLGPL, but I am flexible, ask me if you want something else."
-  :depends-on (#:rectangle-packing #:ccl)
+  :depends-on (#:rectangle-packing #:alexandria)
   :components ((:file "package")
                (:file "image-map")))
 
